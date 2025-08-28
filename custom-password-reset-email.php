@@ -225,6 +225,11 @@ class CustomPasswordReset {
         $site_url = site_url();
         $site_name = get_bloginfo('name');
         
+        // Generate the reset URL and sanitize it
+        $reset_url = network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login');
+        // Remove any tracking parameters (like UTM tags, if they exist)
+        $reset_url = remove_query_arg(['utm_source', 'utm_medium', 'utm_campaign'], $reset_url);
+        
         $logo_url = isset($options['logo_url']) && !empty($options['logo_url']) 
             ? $options['logo_url'] 
             : '';
@@ -232,9 +237,7 @@ class CustomPasswordReset {
         $logo_max_height = isset($options['logo_max_height']) ? $options['logo_max_height'] : 60;
         $button_color = isset($options['button_color']) ? $options['button_color'] : '#0073aa';
         $show_ip = isset($options['show_ip_address']) ? $options['show_ip_address'] : 1;
-        
-        $reset_url = network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login');
-        
+
         $user_ip = '';
         if ($show_ip) {
             $user_ip = $_SERVER['REMOTE_ADDR'];
@@ -250,7 +253,11 @@ class CustomPasswordReset {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;">
             <?php if ($logo_url): ?>
             <div style="text-align: center; margin-bottom: 30px;">
-                <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($site_name); ?>" style="max-height: <?php echo esc_attr($logo_max_height); ?>px;">
+                <img src="<?php echo esc_url($logo_url); ?>" 
+                    alt="<?php echo esc_attr($site_name); ?>" 
+                    style="height: <?php echo esc_attr($logo_max_height); ?>px; max-height: <?php echo esc_attr($logo_max_height); ?>px; width: auto; display: block; margin: 0 auto;" 
+                    height="<?php echo esc_attr($logo_max_height); ?>"
+                    width="auto">
             </div>
             <?php endif; ?>
             <p style="font-size: 16px; color: #555;">
