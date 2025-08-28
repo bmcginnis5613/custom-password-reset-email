@@ -7,7 +7,6 @@
  * Version: 1.0.0
  */
 
-// Prevent direct access
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -329,3 +328,4 @@ class CustomPasswordReset {
 }
 
 new CustomPasswordReset();
+
