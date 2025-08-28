@@ -21,19 +21,10 @@ class CustomPasswordReset {
     }
     
     public function init() {
-        // Add admin menu
         add_action('admin_menu', array($this, 'add_admin_menu'));
-        
-        // Register settings
         add_action('admin_init', array($this, 'register_settings'));
-        
-        // Add settings link to plugin page
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'add_settings_link'));
-        
-        // Initialize password reset customization
         $this->init_password_reset();
-        
-        // Enqueue admin scripts
         add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_scripts'));
     }
     
@@ -235,7 +226,6 @@ class CustomPasswordReset {
         $site_url = site_url();
         $site_name = get_bloginfo('name');
         
-        // Get logo URL from settings
         $logo_url = isset($options['logo_url']) && !empty($options['logo_url']) 
             ? $options['logo_url'] 
             : '';
@@ -246,7 +236,6 @@ class CustomPasswordReset {
         
         $reset_url = network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login');
         
-        // Get IP address if enabled
         $user_ip = '';
         if ($show_ip) {
             $user_ip = $_SERVER['REMOTE_ADDR'];
@@ -339,5 +328,4 @@ class CustomPasswordReset {
     }
 }
 
-// Initialize the plugin
 new CustomPasswordReset();
