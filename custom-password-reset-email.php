@@ -1,11 +1,11 @@
 <?php
-/**
- * Plugin Name: Custom Password Reset Email
- * Description: Customizes the WordPress password reset emails with a configurable logo and styling.
- * Author: FirstTracks Marketing
- * Author URI: https://firsttracksmarketing.com/
- * Version: 1.0.0
- */
+/*
+Plugin Name: Custom Password Reset Email
+Description: Customizes the WordPress password reset emails with a configurable logo and styling.
+Author: FirstTracks Marketing
+Author URI: https://firsttracksmarketing.com/
+Version: 1.0.0
+*/
 
 if (!defined('ABSPATH')) {
     exit;
