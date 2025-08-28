@@ -32,6 +32,7 @@ class CustomPasswordReset {
             return 'text/html';
         });
         
+        add_filter('retrieve_password_title', array($this, 'custom_password_reset_subject'), 10, 2);
         add_filter('retrieve_password_message', array($this, 'custom_lost_password_email'), 10, 4);
     }
     
@@ -80,6 +81,14 @@ class CustomPasswordReset {
         );
         
         add_settings_field(
+            'email_subject',
+            'Email Subject',
+            array($this, 'email_subject_callback'),
+            'custom-password-reset',
+            'general_settings'
+        );
+
+        add_settings_field(
             'show_ip_address',
             'Show IP Address',
             array($this, 'show_ip_address_callback'),
@@ -106,6 +115,10 @@ class CustomPasswordReset {
             $sanitized['button_color'] = sanitize_hex_color($input['button_color']);
         }
         
+        if (isset($input['email_subject'])) {
+            $sanitized['email_subject'] = sanitize_text_field($input['email_subject']);
+        }
+
         $sanitized['show_ip_address'] = isset($input['show_ip_address']) ? 1 : 0;
         
         return $sanitized;
@@ -121,7 +134,7 @@ class CustomPasswordReset {
         
         echo '<input type="url" id="logo_url" name="' . $this->option_name . '[logo_url]" value="' . esc_attr($logo_url) . '" class="regular-text" />';
         echo '<input type="button" id="upload_logo_button" class="button" value="Upload Logo" />';
-        echo '<p class="description">Enter the URL of your logo image or click "Upload Logo" to select from your media library.</p>';
+        echo '<p class="description">Enter the URL of your logo image or click "Upload Logo" to select from the media library.</p>';
         
         if ($logo_url) {
             echo '<div id="logo_preview" style="margin-top: 10px;">';
@@ -135,7 +148,7 @@ class CustomPasswordReset {
         $max_height = isset($options['logo_max_height']) ? $options['logo_max_height'] : 60;
         
         echo '<input type="number" id="logo_max_height" name="' . $this->option_name . '[logo_max_height]" value="' . esc_attr($max_height) . '" min="1" max="200" />';
-        echo '<p class="description">Maximum height for the logo in pixels (default: 60px).</p>';
+        echo '<p class="description">Maximum height for the logo in pixels.</p>';
     }
     
     public function button_color_callback() {
@@ -146,12 +159,20 @@ class CustomPasswordReset {
         echo '<p class="description">Choose the color for the reset password button.</p>';
     }
     
+    public function email_subject_callback() {
+        $options = get_option($this->option_name);
+        $subject = isset($options['email_subject']) ? $options['email_subject'] : 'Password Reset for: ' . parse_url(site_url(), PHP_URL_HOST);
+
+        echo '<input type="text" id="email_subject" name="' . $this->option_name . '[email_subject]" value="' . esc_attr($subject) . '" class="regular-text" />';
+        echo '<p class="description">Enter the subject line for the password reset email.</p>';
+    }
+
     public function show_ip_address_callback() {
         $options = get_option($this->option_name);
         $show_ip = isset($options['show_ip_address']) ? $options['show_ip_address'] : 1;
         
         echo '<input type="checkbox" id="show_ip_address" name="' . $this->option_name . '[show_ip_address]" value="1" ' . checked(1, $show_ip, false) . ' />';
-        echo '<label for="show_ip_address">Display the IP address in the password reset email</label>';
+        echo '<label for="show_ip_address">Display the IP address in the password reset email.</label>';
     }
     
     public function admin_enqueue_scripts($hook) {
@@ -220,6 +241,17 @@ class CustomPasswordReset {
         return $links;
     }
     
+    public function custom_password_reset_subject($title, $user_login) {
+        $options = get_option($this->option_name);
+        $site_domain = parse_url(site_url(), PHP_URL_HOST);
+
+        if (!empty($options['email_subject'])) {
+            return str_replace('{site_domain}', $site_domain, $options['email_subject']);
+        }
+
+        return 'Password Reset for: ' . $site_domain;
+    }
+
     public function custom_lost_password_email($message, $key, $user_login, $user_data) {
         $options = get_option($this->option_name);
         $site_url = site_url();
