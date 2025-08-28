@@ -260,7 +260,7 @@ class CustomPasswordReset {
         // Generate the reset URL and sanitize it
         $reset_url = network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login');
         // Remove any tracking parameters (like UTM tags, if they exist)
-        $reset_url = remove_query_arg(['utm_source', 'utm_medium', 'utm_campaign'], $reset_url);
+        $reset_url = remove_query_arg(['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'], $reset_url);
         
         $logo_url = isset($options['logo_url']) && !empty($options['logo_url']) 
             ? $options['logo_url'] 
